@@ -52,6 +52,10 @@ function changeImg(images: ArrayList) {
         var www: WWW  = new WWW(url);
         yield www;
 
+        // remove loading image
+        var loading = GameObject.Find("Loading");
+        Destroy(loading);
+
         var tex: Texture = www.texture;
         var z_scale: float = tex.height * 1.0/tex.width;
         transform.localScale = Vector3(1, 1, z_scale);
