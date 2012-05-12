@@ -18,7 +18,7 @@ function OnGUI(){
         GUI.skin = gSkin;
     }
 
-    GUILayout.BeginArea(Rect(0,Screen.height*2/3,Screen.width,Screen.height/3));
+    GUILayout.BeginArea(Rect(0,Screen.height*3/4,Screen.width,Screen.height/4));
 
 //    var scale : float = iPhoneScreen.Scale();
 //    var scaledMatrix: Matrix4x4 = Matrix4x4.identity.Scale(Vector3(scale,scale,scale));
