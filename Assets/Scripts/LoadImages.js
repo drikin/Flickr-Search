@@ -7,7 +7,7 @@ import System.Collections.Hashtable;
 //private var json_url = "http://api.flickr.com/services/feeds/photos_public.gne?id=34202117%40N00&format=json&nojsoncallback=1";
 //private var json_url = "http://api.flickr.com/services/feeds/photos_public.gne?id=26153219%40N00&format=json&nojsoncallback=1";
 //private var json_url = "http://api.flickr.com/services/feeds/photos_public.gne?tags=masakiishitani&format=json&nojsoncallback=1";
-private var json_url_base = "http://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=124f163e85a1ad89419349ba560854b0&format=json&nojsoncallback=1&extras=url_z&text=";
+private var json_url_base = "http://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=124f163e85a1ad89419349ba560854b0&format=json&nojsoncallback=1&extras=url_z&media=photos&per_page=500&text=";
 //private var keywoard = WWW.EscapeURL("佐々木希");
 
 function Start () {
@@ -29,6 +29,12 @@ function loadJson() {
         //var images: ArrayList = data['items'];
         var photos: Hashtable = data['photos'];
         var images: ArrayList = photos['photo'];
+
+        // get total number of images
+        var pp: Number = photos['perpage'];
+        var total: String = photos['total'];
+        var t: Number = parseInt(total);
+        var num = (t < pp)? t: pp;
 
         StartCoroutine("changeImg", images);
     }
