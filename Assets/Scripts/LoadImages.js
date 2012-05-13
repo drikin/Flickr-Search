@@ -49,11 +49,12 @@ function changeImg(images: ArrayList) {
             i = 0;
         }
         var image: Hashtable = images[i];
-        //var media: Hashtable = image["media"];
-        //var url: String = media["m"];
-        //url = url.Replace("_m.jpg", ".jpg");
         var url: String = image["url_z"];
         print(url);
+        if (url === null) {
+            i++;
+            continue;
+        }
 
         var www: WWW  = new WWW(url);
         yield www;
@@ -63,14 +64,19 @@ function changeImg(images: ArrayList) {
         Destroy(loading);
 
         var tex: Texture = www.texture;
-        var z_scale: float = tex.height * 1.0/tex.width;
-        transform.localScale = Vector3(1, 1, z_scale);
+
+        var x_scale: float = tex.width * 1.0/tex.height;
+        transform.localScale = Vector3(x_scale, 1, 1);
+
         DestroyImmediate(renderer.material.mainTexture, true);
+
         renderer.material.mainTexture = www.texture;
-        //renderer.material.mainTexture = null;
+
         www = null;
         Resources.UnloadUnusedAssets();	
+
         i++;
+
         yield WaitForSeconds(3.0);
     }
 }
