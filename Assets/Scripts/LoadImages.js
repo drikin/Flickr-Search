@@ -2,6 +2,8 @@
 
 import System.Collections.Hashtable;
 
+var img: GameObject;
+
 //private var json_url = "http://api.flickr.com/services/feeds/photos_public.gne?tags=square&format=json&nojsoncallback=1";
 //var json_url = "http://api.flickr.com/services/feeds/photos_public.gne?tags=square&format=json";
 //private var json_url = "http://api.flickr.com/services/feeds/photos_public.gne?id=34202117%40N00&format=json&nojsoncallback=1";
@@ -68,9 +70,10 @@ function changeImg(images: ArrayList) {
         var x_scale: float = tex.width * 1.0/tex.height;
         transform.localScale = Vector3(x_scale, 1, 1);
 
-        DestroyImmediate(renderer.material.mainTexture, true);
+        //DestroyImmediate(renderer.material.mainTexture, true);
+        DestroyImmediate(img.renderer.material.mainTexture, true);
 
-        renderer.material.mainTexture = www.texture;
+        img.renderer.material.mainTexture = www.texture;
 
         www = null;
         Resources.UnloadUnusedAssets();	
