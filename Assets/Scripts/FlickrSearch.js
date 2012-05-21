@@ -3,6 +3,7 @@
 import System.Collections.Hashtable;
 import Picture;
 
+var searchFab: Transform;
 var Picture: Transform;
 
 // flickr urls /// {{{
@@ -21,6 +22,14 @@ function Start () {
 }
 
 function Update () { // {{{
+    // triple tap handling
+    if(Input.touchCount > 0 && Input.GetTouch(0).tapCount >= 3) {
+        if (Input.GetTouch(0).phase==TouchPhase.Began) {
+            showSearchScreen();
+            return;
+        }
+    }
+
     if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved) {
         // Get movement of the finger since last frame
         var touchDeltaPosition:Vector2 = Input.GetTouch(0).deltaPosition;
@@ -51,6 +60,17 @@ function Update () { // {{{
     }
 } // }}}
 
+function showSearchScreen() {
+    var s = GameObject.Find("Search(Clone)");
+    if (s) {return;}
+
+    var o = GameObject.Find("Picture(Clone)");
+    if (o) {
+        Destroy(o.gameObject);
+    }
+    var search: Transform = Instantiate(searchFab);
+}
+
 function hideSearchScreen() {
     var o = GameObject.Find("Search(Clone)");
     Destroy(o);
@@ -67,7 +87,7 @@ function loadJson() {
     var json: WWW = new WWW (url);
     yield json;
 
-    print(json.text);
+//    print(json.text);
 
     var data: Hashtable = MiniJSON.jsonDecode(json.text);
 
