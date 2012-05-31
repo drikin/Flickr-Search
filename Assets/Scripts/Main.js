@@ -1,12 +1,20 @@
 #pragma strict
 
 var searchFab: Transform;
+private var searchObj: Transform;
 
 function Start () {
-    var search: Transform = Instantiate(searchFab);
+    ShowSearch();
 }
 
 function Update () {
 
 }
 
+function ShowSearch() {
+    var searchObj: Transform = Instantiate(searchFab);
+}
+
+function HideSearch() {
+    Destroy(searchObj);
+}

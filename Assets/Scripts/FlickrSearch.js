@@ -1,9 +1,10 @@
 #pragma strict
 
 import System.Collections.Hashtable;
+import Main;
 import Picture;
 
-var searchFab: Transform;
+var controllerFab: Transform;
 var Picture: Transform;
 
 // flickr urls /// {{{
@@ -21,20 +22,77 @@ private var speed = 0.02;
 function Start () {
 }
 
+function SingleTap() {
+    yield WaitForSeconds(0.7);
+    print("single");
+
+    var c = GameObject.FindWithTag("Controller");
+    if (c) {
+        pause = !pause;
+        print("pause:" + pause);
+        var o: GameObject;
+        if (pause) {
+            o = c.Find("Pause");
+        } else {
+            o = c.Find("Play");
+        }
+        o.animation.Play();
+    }
+}
+
+function DoubleTap() {
+    yield WaitForSeconds(0.5);
+    print("double");
+
+    StopCoroutine("SingleTap");
+
+    if (flickr_url) {
+        Application.OpenURL(flickr_url);
+    }
+}
+
+function TripleTap() {
+    yield WaitForSeconds(0.3);
+    print("triple");
+
+    StopCoroutine("DoubleTap");
+    StopCoroutine("SingleTap");
+
+    showSearchScreen();
+}
+
 function Update () { // {{{
-    // triple tap handling
-    if(Input.touchCount > 0 && Input.GetTouch(0).tapCount >= 3) {
+    // single tap
+    if(Input.touchCount > 0 && Input.GetTouch(0).tapCount == 1) {
         if (Input.GetTouch(0).phase==TouchPhase.Began) {
-            showSearchScreen();
-            return;
+            StartCoroutine("SingleTap");
+        }
+    }
+    if(Input.GetMouseButtonDown(0)) {
+        //StartCoroutine("SingleTap");
+    }
+
+    // double tap handling
+    if(Input.touchCount > 0 && Input.GetTouch(0).tapCount == 2) {
+        if (Input.GetTouch(0).phase==TouchPhase.Began) {
+            StartCoroutine("DoubleTap");
+        }
+    }
+
+    // triple tap handling
+    if(Input.touchCount > 0 && Input.GetTouch(0).tapCount == 3) {
+        if (Input.GetTouch(0).phase==TouchPhase.Began) {
+            StartCoroutine("TripleTap");
         }
     }
 
     if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved) {
+        StopCoroutine("SingleTap");
+
         // Get movement of the finger since last frame
         var touchDeltaPosition:Vector2 = Input.GetTouch(0).deltaPosition;
 
-        var p = GameObject.Find("Picture(Clone)");
+        var p = GameObject.FindWithTag("Picture");
 
         if (p) {
             // Move object across XY plane
@@ -49,31 +107,43 @@ function Update () { // {{{
         }
         return;
     }
-
-    if (Input.touchCount > 0 || Input.GetMouseButtonDown(0)) {
-        pause = !pause;
-        print("pause:" + pause);
-
-        if (flickr_url) {
-            Application.OpenURL(flickr_url);
-        }
-    }
 } // }}}
 
 function showSearchScreen() {
-    var s = GameObject.Find("Search(Clone)");
+    var s = GameObject.FindWithTag("Search");
     if (s) {return;}
 
-    var o = GameObject.Find("Picture(Clone)");
-    if (o) {
+    var cobjs = GameObject.FindGameObjectsWithTag("Controller");
+    for (var c in cobjs) {
+        Destroy(c.gameObject);
+    }
+
+    pictures = [];
+    StopCoroutine("createPictures");
+
+    yield WaitForSeconds(1);
+
+    var objs = GameObject.FindGameObjectsWithTag("Picture");
+    for (var o in objs) {
         Destroy(o.gameObject);
     }
-    var search: Transform = Instantiate(searchFab);
+
+    var mObj = GameObject.Find("Main Script");
+    var m: Main = mObj.GetComponent("Main");
+    m.ShowSearch();
 }
 
 function hideSearchScreen() {
-    var o = GameObject.Find("Search(Clone)");
-    Destroy(o);
+    var objs = GameObject.FindGameObjectsWithTag("Search");
+    for (var o in objs) {
+        Destroy(o.gameObject);
+    }
+}
+
+function restart() {
+    hideSearchScreen();
+    yield WaitForSeconds(1);
+    showSearchScreen();
 }
 
 function loadJson() {
@@ -86,8 +156,12 @@ function loadJson() {
 
     var json: WWW = new WWW (url);
     yield json;
+    //print(json.text);
 
-//    print(json.text);
+    if (json.error !== null) {
+        Debug.Log(json.error);
+        restart();
+    }
 
     var data: Hashtable = MiniJSON.jsonDecode(json.text);
 
@@ -111,6 +185,8 @@ function loadJson() {
         StartCoroutine("createPictures", images);
 
         hideSearchScreen();
+    } else {
+        restart();
     }
 }
 
@@ -118,7 +194,15 @@ function createPictures(images: ArrayList) {
     var i = 0;
     var l = images.Count;
 
+    pause = false;
+    Instantiate(controllerFab);
+
     while(true) {
+        if (pause) {
+            yield;
+            continue;
+        }
+
         if (i > l - 1) {
             i = 0;
         }
@@ -127,7 +211,7 @@ function createPictures(images: ArrayList) {
         var owner: String = image["owner"];
         var id: String = image["id"];
         flickr_url = flickr_base_url + owner + "/" + id;
-        print(flickr_url);
+        //print(flickr_url);
         if (url === null) {
             i++;
             continue;
@@ -137,9 +221,13 @@ function createPictures(images: ArrayList) {
         yield www;
 
         while (pictures.length > 0) {
-            var p: Transform = pictures.pop();
-            Destroy(p.gameObject);
+            //var p: Transform = pictures.pop();
+            //Destroy(p.gameObject);
+            var pp: Transform = pictures.pop();
+            var ps: Picture = pp.GetComponent("Picture");
+            ps.hide();
         }
+
         var pic: Transform = Instantiate(Picture);
         var s: Picture = pic.GetComponent("Picture");
         s.setTexture(www.texture);
@@ -151,3 +239,5 @@ function createPictures(images: ArrayList) {
         yield WaitForSeconds(3.0);
     }
 }
+
+// vim: tabstop=4 shiftwidth=4 textwidth=0 expandtab foldmethod=marker nowrap

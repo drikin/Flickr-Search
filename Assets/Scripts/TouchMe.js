@@ -20,25 +20,22 @@ function OnGUI() {
     if (keyboard&&keyboard.done) {
         var val: String = keyboard.text;
 
-        //if (val) {
-        if (true) {
-            print ("User input is: " + val);
-            PlayerPrefs.SetString("Keyword", val);
+        print ("User input is: " + val);
+        PlayerPrefs.SetString("Keyword", val);
 
-            // hide Touch Me
-            var t = GameObject.Find("Touch Me");
-            Destroy(t);
+        // hide Touch Me
+        var t = GameObject.Find("Touch Me");
+        Destroy(t);
 
-            // change Eye animation
-            var o = GameObject.Find("Eye");
-            o.animation.CrossFade("Searching", 0.2);
+        // change Eye animation
+        var o = GameObject.Find("Eye");
+        o.animation.CrossFade("Searching", 0.2);
 
-            // start to search
-            var f = GameObject.Find("Flickr Search Script");
-            var s: FlickrSearch = f.GetComponent("FlickrSearch");
-            s.loadJson();
+        // start to search
+        var f = GameObject.Find("Flickr Search Script");
+        var s: FlickrSearch = f.GetComponent("FlickrSearch");
+        s.loadJson();
 
-            keyboard = null;
-        }
+        keyboard = null;
     }
 }

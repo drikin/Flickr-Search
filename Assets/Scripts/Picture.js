@@ -1,13 +1,13 @@
 #pragma strict
 
 var photoObj: Transform;
-var imgObj: Transform;
+var bgObj: GameObject;
+var imgObj: GameObject;
 
 function Start () {
 }
 
 function Update () {
-
 }
 
 function setTexture(tex: Texture) {
@@ -19,3 +19,12 @@ function setTexture(tex: Texture) {
     imgObj.renderer.material.mainTexture = tex;
 }
 
+function hide() {
+    this.animation.Play("Hide");
+}
+
+function destroy() {
+    //print("destroy");
+    DestroyImmediate(this.gameObject, true);
+    Resources.UnloadUnusedAssets();
+}

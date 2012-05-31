@@ -1,16 +1,28 @@
 #pragma strict
 
-private var banner : ADBannerView = null;
+private var banner: ADBannerView = null;
+private var orientation: ScreenOrientation;
 
 function Start () {
-    banner = new ADBannerView();
-    banner.autoSize = true;
-    banner.autoPosition = ADPosition.Bottom;
-    StartCoroutine(ShowBanner());
+    orientation = Screen.orientation;
+    StartBanner();
 }
 
 function Update () {
+    if (orientation != Screen.orientation) {
+        orientation = Screen.orientation;
+        print("orientation has changed");
+        StartBanner();
+    }
+}
 
+function StartBanner() {
+    print("StartBanner");
+    banner = new ADBannerView();
+    banner.autoSize = true;
+    banner.autoPosition = ADPosition.Bottom;
+
+    StartCoroutine(ShowBanner());
 }
 
 function ShowBanner() {
@@ -21,6 +33,9 @@ function ShowBanner() {
     if (banner.error == null) {
         banner.Show();
     } else {
+        print("ShowBanner failed");
         banner = null;
+        yield WaitForSeconds(3);
+        StartBanner();
     }
 }
